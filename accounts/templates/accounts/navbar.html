@@ -1,3 +1,11 @@
+<style>
+  .hello-msg{
+    font-size: 18px;
+    color: #fff;
+    margin-right: 20px;
+  }
+</style>
+
 <nav class="navbar navbar-expand-lg bg-body-tertiary navbar-dark bg-dark">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">Siddhesh Angane</a>
@@ -6,17 +14,21 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
+          {% if request.user.is_staff %}
           <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="#">Dashboard</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#">Products</a>
           </li>
+          {% endif %}
           <!-- <li class="nav-item">
             <a class="nav-link" href="#">Customer</a>
           </li> -->
           
         </ul>
       </div>
+      <span class="hello-msg">Hello, {{request.user}}</span>
+      <span><a  class="hello-msg" href="{% url 'logout_user' %}">Logout</a></span>
     </div>
   </nav>
