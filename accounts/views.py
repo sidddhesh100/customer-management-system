@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import *
 from django.contrib.auth.models import Group
-from .forms import OrderForm, CreateUserForm
+from .forms import OrderForm, CreateUserForm, CustomerForm
 from django.forms import inlineformset_factory
 from .filters import OrderFilter
 from django.contrib import messages
@@ -43,9 +43,9 @@ def customer(request, pk):
     customer = Customer.objects.get(id=pk)
     orders = customer.order_set.all()
     order_count = orders.count()
-    myFilter = OrderFilter(request.GET, queryset=orders)
-    order = myFilter.qs
-    context = {"customer": customer, "orders": orders, "order_count": order_count,"myFilter": myFilter}
+    my_filter = OrderFilter(request.GET, queryset=orders)
+    order = my_filter.qs
+    context = {"customer": customer, "orders": orders, "order_count": order_count,"myFilter": my_filter}
     return render(request, 'accounts/customer.html', context=context)
 
 @login_required(login_url='login_page')
@@ -100,7 +100,7 @@ def login_page(request):
     context = dict()
     return render(request, 'accounts/login.html', context)
 
-@unauthenticated_user
+
 def register_page(request):
     form = CreateUserForm()
     if request.method == "POST":
@@ -110,15 +110,39 @@ def register_page(request):
             username = form.cleaned_data.get("username",'')
             group = Group.objects.get(name="customer")
             user.groups.add(group)
+            Customer.objects.create(user=user, name = user.username)
             messages.success(request, f"Account was created for {username}")
             return redirect('/login')
     context = dict(form=form)
     return render(request, 'accounts/register.html', context)
 
+@login_required(login_url='login_page')
 def logout_user(request):
     logout(request)
     return redirect("/login")
 
+@login_required(login_url='login_page')
+@allowed_users(allowed_roles=['customer'])
 def user_page(request):
     context = dict()
+    try:
+        orders = request.user.customer.order_set.all()
+        context["orders"] = orders
+    except Exception:
+        pass
     return render(request, 'accounts/user.html', context)
+
+@login_required(login_url='login_page')
+@allowed_users(allowed_roles=['customer'])
+def accounts_settings(request):
+    customer = request.user.customer
+    form = CustomerForm(instance=customer)
+    if request.method == "POST":
+        form = CustomerForm(request.POST, request.FILES, instance=customer)
+        if form.is_valid():
+            form.save()
+            
+    context = dict(
+        form = form
+    )
+    return render(request, 'accounts/account_settings.html', context=context)
