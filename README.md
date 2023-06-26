@@ -83,3 +83,7 @@ Contributions to the Customer Management Platform are welcome! If you have any s
 ## Acknowledgments
 
 We would like to express our gratitude to the developers and contributors of Python, Django, MySQL, HTML, CSS, and Bootstrap for their remarkable work and support, which made the development of this platform possible.
+
+## License
+
+The Amazon Clone project is licensed under the [MIT License](LICENSE). You are free to modify, distribute, and use the code for personal and commercial purposes.
